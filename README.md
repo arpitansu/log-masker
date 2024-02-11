@@ -60,10 +60,8 @@ logMaskerSetMaskingFields(mapFieldsToFindToGenericMaskingFields);
  * @param {boolean} cacheKeyInData - Whether the cache key is in the data object or not
  * @returns {Object} - The masked data object
  */
-function maskData(data, cacheKey, cacheKeyInData) {
-  // Mask the data (no error thrown if the data is not a valid JSON)
-  return logMaskerMaskData(data, cacheKey, cacheKeyInData);
-}
+// Mask the data (no error thrown if the data is not a valid JSON)
+const maskedData = logMaskerMaskData(data, cacheKey, cacheKeyInData?);
 ```
 
 Feel free to customize the code according to your specific needs and integrate it seamlessly into your project.
