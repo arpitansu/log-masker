@@ -1,29 +1,69 @@
-Example use:
+# Log Masker Library
 
-//import the library
-const { logMaskerMaskData, logMaskerSetMaskingFields, logMaskerMaskDataSetDebugMode, logMaskerSetCacheUpdateEndTime} = require('./logMasker_masking_library');
+```
+npm i log-masker
+```
 
-//set the debug mode, it will show required logs and errors if any
+## Example Usage
+
+### Import the Library
+
+```javascript
+const {
+  logMaskerMaskData,
+  logMaskerSetMaskingFields,
+  logMaskerMaskDataSetDebugMode,
+  logMaskerSetCacheUpdateEndTime
+} = require('log-masker');
+```
+
+### Set Debug Mode
+
+```javascript
+// Enable debug mode to show required logs and errors
 logMaskerMaskDataSetDebugMode(true);
+```
 
-//set time for when to stop updating cache
-//set according to your requrirement, figure ot the time in how much time your code will be ready with cached data
+### Set Cache Update Time
+
+```javascript
+// Set the time for when to stop updating cache (in milliseconds)
+// Adjust according to your requirements based on how long your code will be ready with cached data
 logMaskerSetCacheUpdateEndTime(60000);
+```
 
-//set the fields to be masked, check from your logs which fields are sensitive and need to be masked
+### Set Masking Fields
+
+```javascript
+// Define the fields to be masked based on sensitivity
 const mapFieldsToFindToGenericMaskingFields = {
-    stringFields: ['name', 'customer_name', 'address'],
-    phoneFields: ['phone', 'mobile'],
-    emailFields: ['email'],
-    passwordFields: ['password'],
-    cardFields: ['card'],
-    uuidFields: ['uuid'],
-}
-logMaskerSetMaskingFields(mapFieldsToFindToGenericMaskingFields)
+  stringFields: ['name', 'customer_name', 'address'],
+  phoneFields: ['phone', 'mobile'],
+  emailFields: ['email'],
+  passwordFields: ['password'],
+  cardFields: ['card'],
+  uuidFields: ['uuid'],
+};
 
-function(data){
-    //mask the data, it will not throw error if the data is not a valid JSON
-    //cacheKey should be string, this will cache keys of data object to be masked
-    //cacheKeyInData should be boolean, if the field is in the data object, if not it will use the field as it is
-    return logMaskerMaskData(data, cacheKey, cacheKeyInData?);
+// Set the masking fields
+logMaskerSetMaskingFields(mapFieldsToFindToGenericMaskingFields);
+```
+
+### Mask Data
+
+```javascript
+/**
+ * Mask the data
+ * 
+ * @param {Object} data - The data object to be masked
+ * @param {string} cacheKey - The cache key for the data object
+ * @param {boolean} cacheKeyInData - Whether the cache key is in the data object or not
+ * @returns {Object} - The masked data object
+ */
+function maskData(data, cacheKey, cacheKeyInData) {
+  // Mask the data (no error thrown if the data is not a valid JSON)
+  return logMaskerMaskData(data, cacheKey, cacheKeyInData);
 }
+```
+
+Feel free to customize the code according to your specific needs and integrate it seamlessly into your project.
