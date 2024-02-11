@@ -1,5 +1,7 @@
 # Log Masker Library
 
+This library intelligently checks for all occurrences of the specified fields to be masked within a nested object and caches the path for later use. Customize the code to fit your project's specific requirements.
+
 ```
 npm i log-masker
 ```
