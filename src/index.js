@@ -1,4 +1,3 @@
-const { get: _get, set: _set } = require('lodash');
 const MaskData = require('maskdata');
 
 /**
