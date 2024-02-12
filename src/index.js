@@ -101,6 +101,8 @@ let _CACHE_START_TIME = Date.now();
 //after this time cache updates will stop and recursive calls will not be made to check fields
 //this time should be configured as per your application needs, this should be enough to cache all the fields in all APIs
 let _CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS = 60 * 1000; // 1 minute in milliseconds
+//_FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS will be used when new fields are updated from _setMapFieldsToFindToGenericMaskingFields
+let _FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS = 60 * 1000; // 1 minute in milliseconds
 
 /**
  * 
@@ -161,6 +163,7 @@ let _fieldsToFind = []
  *   }
  */
 function _setMapFieldsToFindToGenericMaskingFields(fields) {
+    _setCacheTimeToStopCaching(_FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS); // update the cache update time, because fields are updated
     _mapFieldsToFindToGenericMaskingFields = fields
     _fieldsToFind = Object.values(_mapFieldsToFindToGenericMaskingFields).reduce((acc, val) => acc.concat(val), []);
 }

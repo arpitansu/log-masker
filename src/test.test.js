@@ -65,4 +65,30 @@ describe('logMasker Masking Library', () => {
         expect(maskedData).toEqual(data);
     });
 
+    test('should update cache when fields are updated', () => {
+        const fields = {
+            stringFields: ['']
+        }
+        logMaskerSetCacheUpdateEndTime(0);
+        logMaskerSetMaskingFields(fields);
+        const start = new Date();
+        while(new Date() - start < 11){};
+
+        while(new Date() - start < 10){};
+        const newFieldsToConsiderForMasking = {
+            stringFields: ['newField']
+        }
+        logMaskerSetMaskingFields(newFieldsToConsiderForMasking);
+        const data = {
+            newField: "should be masked"
+        };
+
+        while(new Date() - start < 20){};
+        const maskedData = logMaskerMaskData(data, 'test1'); // using test1 because it is already used in first test
+        const expected = {
+            newField: "****************"
+        };
+        expect(maskedData).toEqual(expected);
+    });
+
 });
