@@ -8,7 +8,7 @@ const { logMaskerMaskDataSetDebugMode, logMaskerSetMaskingFields, logMaskerMaskD
 describe('logMasker Masking Library', () => {
     beforeAll(() => {
         logMaskerMaskDataSetDebugMode(true);
-        logMaskerSetCacheUpdateEndTime(60000);
+        logMaskerSetCacheUpdateEndTime(100);
         const mapFieldsToFindToGenericMaskingFields = {
             stringFields: ['name', 'customer_name', 'address'],
             phoneFields: ['phone', 'mobile'],
@@ -17,7 +17,6 @@ describe('logMasker Masking Library', () => {
             cardFields: ['card'],
             uuidFields: ['uuid'],
         }
-        logMaskerMaskDataSetDebugMode(true);
         logMaskerSetMaskingFields(mapFieldsToFindToGenericMaskingFields);
     });
 
@@ -66,27 +65,24 @@ describe('logMasker Masking Library', () => {
     });
 
     test('should update cache when fields are updated', () => {
-        const fields = {
-            stringFields: ['']
-        }
-        logMaskerSetCacheUpdateEndTime(0);
-        logMaskerSetMaskingFields(fields);
         const start = new Date();
-        while(new Date() - start < 11){};
-
-        while(new Date() - start < 10){};
+        while (new Date() - start < 110) {
+            // wait for cache update time to pass
+        }
         const newFieldsToConsiderForMasking = {
-            stringFields: ['newField']
+            stringFields: ['', 'newField']
         }
         logMaskerSetMaskingFields(newFieldsToConsiderForMasking);
         const data = {
-            newField: "should be masked"
+            nested2: {
+                newField: "should be masked"
+            }
         };
-
-        while(new Date() - start < 20){};
         const maskedData = logMaskerMaskData(data, 'test1'); // using test1 because it is already used in first test
         const expected = {
-            newField: "****************"
+            nested2: {
+                newField: "****************"
+            }
         };
         expect(maskedData).toEqual(expected);
     });

@@ -5,10 +5,10 @@ const MaskData = require('maskdata');
     do not set it directly
 */
 let _DEBUG = false;
-if(process.env.DEBUG){
-    if(process.env.DEBUG === 'true'){
+if (process.env.DEBUG) {
+    if (process.env.DEBUG === 'true') {
         _DEBUG = true;
-    }else _DEBUG = false;
+    } else _DEBUG = false;
 }
 
 /**
@@ -100,21 +100,25 @@ let _CACHE_START_TIME = Date.now();
 //after this time cache updates will stop and recursive calls will not be made to check fields
 //this time should be configured as per your application needs, this should be enough to cache all the fields in all APIs
 let _CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS = 60 * 1000; // 1 minute in milliseconds
-//_FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS will be used when new fields are updated from _setMapFieldsToFindToGenericMaskingFields
-let _FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS = 60 * 1000; // 1 minute in milliseconds
 
 /**
  * 
  * @param {required} milliseconds time in milliseconds - 60000 for 1 minute is defaulf
  * @returns void
  */
-function _setCacheTimeToStopCaching(milliseconds){
-    if(typeof milliseconds !== 'number') {
-        if(_DEBUG) console.error("INFO: cache update time should be a number");
+function _setCacheTimeToStopCaching(milliseconds) {
+    if (typeof milliseconds !== 'number') {
+        if (_DEBUG) console.error("INFO: cache update time should be a number");
         return
     };
-    if(_DEBUG) console.log("INFO: setting cache update stop time to: " + milliseconds);
+    if (_DEBUG) console.log("INFO: setting cache update stop time to: " + milliseconds);
     _CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS = milliseconds;
+}
+
+function _resetCacheTime() {
+    if (_DEBUG) console.log("INFO: Resetting cache update stop time");
+    _CACHE_START_TIME = Date.now();
+    if (_DEBUG) console.log("INFO: Cache update stop time reset to: " + new Date(_CACHE_START_TIME + _CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS));
 }
 
 /*
@@ -162,9 +166,44 @@ let _fieldsToFind = []
  *   }
  */
 function _setMapFieldsToFindToGenericMaskingFields(fields) {
-    _setCacheTimeToStopCaching(_FALLBACK_CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS); // update the cache update time, because fields are updated
-    _mapFieldsToFindToGenericMaskingFields = fields
+    // Check if fields is null, undefined, or an empty object
+    if (!fields || Object.keys(fields).length === 0) {
+        return;
+    }
+
+    let newFieldsAdded = false;
+
+    // Merge the old and new fields
+    for (let key in fields) {
+        // Filter out empty strings from the array for this key
+        const newFields = fields[key].filter(field => field);
+
+        // Check if the array for this key is empty
+        if (!newFields.length) {
+            continue;
+        }
+        if(_DEBUG) console.log("INFO: New fields to be added: ", newFields);
+        if (_mapFieldsToFindToGenericMaskingFields.hasOwnProperty(key)) {
+            const oldFields = _mapFieldsToFindToGenericMaskingFields[key];
+            _mapFieldsToFindToGenericMaskingFields[key] = [...new Set([...oldFields, ...newFields])];
+
+            // Check if new fields were added
+            if (_mapFieldsToFindToGenericMaskingFields[key].length !== oldFields.length) {
+                newFieldsAdded = true;
+            }
+        } else {
+            _mapFieldsToFindToGenericMaskingFields[key] = newFields;
+            newFieldsAdded = true;
+        }
+    }
+
+    if (_DEBUG) console.log("INFO: Setting fields to be masked", _mapFieldsToFindToGenericMaskingFields);
     _fieldsToFind = Object.values(_mapFieldsToFindToGenericMaskingFields).reduce((acc, val) => acc.concat(val), []);
+
+    // Only reset the cache time if new fields were added
+    if (newFieldsAdded) {
+        _resetCacheTime(); // update the cache update time, because fields are updated
+    }
 }
 
 /**
@@ -174,10 +213,10 @@ function _setMapFieldsToFindToGenericMaskingFields(fields) {
  */
 function _masklogMaskerData(data, cackeKeyToUse) {
     if (!_cache) {
-        if(_DEBUG) console.error("ERROR: No fields to mask found", { [cackeKeyToUse]: _cache[cackeKeyToUse] });
+        if (_DEBUG) console.error("ERROR: No fields to mask found", { [cackeKeyToUse]: _cache[cackeKeyToUse] });
         return data;
     }
-    if(_DEBUG) console.log("INFO: Masking fields", { [cackeKeyToUse]: _cache[cackeKeyToUse]});
+    if (_DEBUG) console.log("INFO: Masking fields", { [cackeKeyToUse]: _cache[cackeKeyToUse] });
     return MaskData.maskJSON2(data, { ..._DEFAULT_MASK_CONFIG, ..._cache[cackeKeyToUse] });
 }
 
@@ -189,13 +228,13 @@ function _masklogMaskerData(data, cackeKeyToUse) {
 function _isCheckNeededToMask(cacheKeyToUse) {
     try {
         // If the cacheKeyToUse is not in the _cache, skip the check
-        if(!_cache.hasOwnProperty(cacheKeyToUse)) {
+        if (!_cache.hasOwnProperty(cacheKeyToUse)) {
             _cache[cacheKeyToUse] = {};
             return true;
         }
 
         //if the cacheKeyToUse is in the _cache but has no fields to mask, skip the check
-        if(Object.keys(_cache[cacheKeyToUse]).length === 0) {
+        if (Object.keys(_cache[cacheKeyToUse]).length === 0) {
             return true;
         }
 
@@ -203,7 +242,7 @@ function _isCheckNeededToMask(cacheKeyToUse) {
         if (Date.now() - _CACHE_START_TIME > _CACHE_DURATION_UNTIL_CACHE_UPDATE_STOPS) {
             return false;
         }
-        
+
         // return true by default
         return true;
     } catch (error) {
@@ -226,7 +265,7 @@ function _findFields(data, cacheKey, _path = '') {
         if (data.hasOwnProperty(key)) {
             const newPath = _path ? `${_path}.${key}` : key;
             let maskingOptionToUse = null;
-            
+
             if (_fieldsToFind.includes(key)) {
                 // Generic masking fields to be set in cache
                 for (const genericKey in _mapFieldsToFindToGenericMaskingFields) {
@@ -292,20 +331,20 @@ function _findCacheKey(data, cacheKey, cacheKeyInData) {
  * doest not throws error if the data is not a valid JSON
  * will only handle valid json or valid json strings
  */
-function _maskMyData(data, cacheKey, cacheKeyInData = false){
-    try{
+function _maskMyData(data, cacheKey, cacheKeyInData = false) {
+    try {
         const _cackeKeyToUse = _findCacheKey(data, cacheKey, cacheKeyInData);
         const isCheckNeededToMask = _isCheckNeededToMask(_cackeKeyToUse);
-        if(_DEBUG){
+        if (_DEBUG) {
             console.log(`INFO: Is check needed to mask: ${isCheckNeededToMask}`);
-            if(isCheckNeededToMask) console.log(`INFO: Fields will be checked recursilvely`);
+            if (isCheckNeededToMask) console.log(`INFO: Fields will be checked recursilvely`);
         }
-        if(isCheckNeededToMask){
+        if (isCheckNeededToMask) {
             _findFields(data, _cackeKeyToUse);
         }
-        return _masklogMaskerData(data, _cackeKeyToUse); 
-    }catch(error){
-        if(_DEBUG) console.error(`ERROR: ${error}`);
+        return _masklogMaskerData(data, _cackeKeyToUse);
+    } catch (error) {
+        if (_DEBUG) console.error(`ERROR: ${error}`);
         return data;
     }
 }
