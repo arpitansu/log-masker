@@ -6,7 +6,7 @@ describe('logMasket masking configuration with X', () => {
     test('should set the masking configuration', () => {
         logMaskerMaskDataSetDebugMode(true);
         logMaskerSetCacheUpdateEndTime(100);
-        const maskningConfig = {
+        const maskingConfig = {
             stringMaskOptions: {
                 maskWith: "X",
                 maskOnlyFirstOccurance: false,
@@ -14,7 +14,7 @@ describe('logMasket masking configuration with X', () => {
                 maskSpace: false
             }
         }
-        logMaskerSetMaskConfig(maskningConfig);
+        logMaskerSetMaskConfig(maskingConfig);
 
         const mapFieldsToFindToGenericMaskingFields = {
             stringFields: ['name', 'customer_name', 'address'],

@@ -13,6 +13,7 @@ npm i log-masker
 ```javascript
 const {
   logMaskerMaskData,
+  logMaskerSetMaskConfig,
   logMaskerSetMaskingFields,
   logMaskerMaskDataSetDebugMode,
   logMaskerSetCacheUpdateEndTime
@@ -33,6 +34,77 @@ logMaskerMaskDataSetDebugMode(true);
 // Adjust according to your requirements based on how long your code will be ready with cached data
 // fine tune this time to work best for your usecase
 logMaskerSetCacheUpdateEndTime(60000);
+```
+
+### Set Masking Configuration
+
+```javascript
+// Set the masking configuration
+// Customize the masking configuration according to your specific needs
+// The following configuration is just an example
+// DOCS: https://www.npmjs.com/package/maskdata
+// please ensure that the config is valid, else it will not work as expected
+const maskingConfig = {
+    cardMaskOptions: {
+        maskWith: "*",
+        unmaskedStartDigits: 4,
+        unmaskedEndDigits: 1
+    },
+
+    emailMaskOptions: {
+        maskWith: "*",
+        unmaskedStartCharactersBeforeAt: 3,
+        unmaskedEndCharactersAfterAt: 2,
+        maskAtTheRate: false
+    },
+
+    passwordMaskOptions: {
+        maskWith: "*",
+        maxMaskedCharacters: 16,
+        unmaskedStartCharacters: 0,
+        unmaskedEndCharacters: 0
+    },
+
+    phoneMaskOptions: {
+        maskWith: "*",
+        unmaskedStartDigits: 4,
+        unmaskedEndDigits: 1
+    },
+
+    stringMaskOptions: {
+        maskWith: "*",
+        maskOnlyFirstOccurance: false,
+        maskAll: true,
+        maskSpace: false
+    },
+
+    uuidMaskOptions: {
+        maskWith: "*",
+        unmaskedStartCharacters: 0,
+        unmaskedEndCharacters: 0
+    },
+
+    jwtMaskOptions: {
+        maskWith: '*',
+        maxMaskedCharacters: 512,
+        maskDot: true,
+        maskHeader: true,
+        maskPayload: true,
+        maskSignature: true
+    },
+    // To extend the mask function to other types of data. 
+    genericStrings: [
+        {
+            config: {
+                maskWith: "*",
+                maxMaskedCharacters: 256,
+                unmaskedStartDigits: 0,
+                unmaskedEndDigits: 0
+            },
+        }
+    ]
+}
+logMaskerSetMaskConfig(maskingConfig);
 ```
 
 ### Set Masking Fields
