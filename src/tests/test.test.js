@@ -3,7 +3,7 @@
  * npm i jest
  * run jest in the root directory
  */
-const { logMaskerMaskDataSetDebugMode, logMaskerSetMaskingFields, logMaskerMaskData, logMaskerSetCacheUpdateEndTime } = require('./index');
+const { logMaskerMaskDataSetDebugMode, logMaskerSetMaskingFields, logMaskerMaskData, logMaskerSetCacheUpdateEndTime } = require('../index');
 
 describe('logMasker Masking Library', () => {
     beforeAll(() => {
@@ -81,10 +81,11 @@ describe('logMasker Masking Library', () => {
         const maskedData = logMaskerMaskData(data, 'test1'); // using test1 because it is already used in first test
         const expected = {
             nested2: {
-                newField: "****************"
+                newField: "****** ** ******"
             }
         };
         expect(maskedData).toEqual(expected);
     });
 
 });
+

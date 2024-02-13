@@ -26,7 +26,7 @@ function _setDebugMode(value) {
     it will mask the data based on the options provided
     for now it is not configurable, but can be made configurable in future
 */
-const _DEFAULT_MASK_CONFIG = {
+let _DEFAULT_MASK_CONFIG = {
     cardMaskOptions: {
         maskWith: "*",
         unmaskedStartDigits: 4,
@@ -57,7 +57,7 @@ const _DEFAULT_MASK_CONFIG = {
         maskWith: "*",
         maskOnlyFirstOccurance: false,
         maskAll: true,
-        maskSpace: true
+        maskSpace: false
     },
 
     uuidMaskOptions: {
@@ -86,6 +86,22 @@ const _DEFAULT_MASK_CONFIG = {
         }
     ]
 };
+
+/**
+ * 
+ * @param {Object} config DOCS: https://www.npmjs.com/package/maskdata
+ * @returns void
+ * if masking config is set then default config will be overriden, if not set then default config will be used
+ * please ensure that the config is valid, else it will not work as expected
+ */
+function _setMaskConfig(config) {
+    if(typeof config !== 'object') {
+        if (_DEBUG) console.error("ERROR: Mask config should be an object");
+        return;
+    }
+    if (_DEBUG) console.log("INFO: Setting mask config", config);
+    _DEFAULT_MASK_CONFIG = config;
+}
 
 /*
     _cache will contain the fields to be masked
@@ -353,7 +369,8 @@ module.exports = {
     logMaskerMaskDataSetDebugMode: _setDebugMode,
     logMaskerSetMaskingFields: _setMapFieldsToFindToGenericMaskingFields,
     logMaskerMaskData: _maskMyData,
-    logMaskerSetCacheUpdateEndTime: _setCacheTimeToStopCaching
+    logMaskerSetCacheUpdateEndTime: _setCacheTimeToStopCaching,
+    logMaskerSetMaskConfig: _setMaskConfig
 }
 
 /**
